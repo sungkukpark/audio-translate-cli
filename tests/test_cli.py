@@ -10,8 +10,8 @@ def test_defaults(tmp_path):
     f = tmp_path / "audio.mp3"
     f.write_bytes(b"")
     args = parse_args(["--input", str(f)])
-    assert args.model == "small"
-    assert args.device == "cpu"
+    assert args.model == "medium"
+    assert args.device == "cuda"
     assert not args.overwrite
     assert not args.verbose
 

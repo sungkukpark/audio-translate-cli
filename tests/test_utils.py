@@ -4,18 +4,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+from app.errors import ValidationError
 from app.utils import validate_input_file, ensure_output_dir
 
 
 def test_validate_missing_file(tmp_path):
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValidationError, match="not found"):
         validate_input_file(tmp_path / "missing.mp3")
 
 
 def test_validate_unsupported_extension(tmp_path):
     f = tmp_path / "audio.xyz"
     f.write_bytes(b"")
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValidationError, match="Unsupported"):
         validate_input_file(f)
 
 

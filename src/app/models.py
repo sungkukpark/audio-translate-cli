@@ -18,3 +18,12 @@ class TranslationResult:
     text: str
     segments: list[Segment] = field(default_factory=list)
     duration: float | None = None
+
+
+@dataclass
+class DubResult:
+    text_source: str
+    voice_id: str
+    model_id: str
+    output_path: Path
+    chunks_synthesized: int = 1

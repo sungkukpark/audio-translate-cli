@@ -10,6 +10,9 @@ uv.lock
 # Project outputs
 outputs/
 
+# Environment / secrets
+.env
+
 # Claude Code
 .claude/settings.local.json
 

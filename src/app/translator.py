@@ -1,21 +1,21 @@
-import sys
 from pathlib import Path
 
+from app.errors import DependencyError, TranslationError
 from app.models import Segment, TranslationResult
 
 
 def resolve_device(requested: str) -> str:
     """Return 'cuda' if available and requested, otherwise 'cpu'."""
-    if requested in ("cpu",):
+    if requested == "cpu":
         return "cpu"
     try:
         import torch
         if torch.cuda.is_available():
             return "cuda"
         if requested == "cuda":
+            import sys
             print(
-                "Warning: CUDA requested but torch.cuda.is_available() is False. "
-                "Falling back to CPU. Install a CUDA-enabled PyTorch to use the GPU.",
+                "Warning: CUDA requested but not available. Falling back to CPU.",
                 file=sys.stderr,
             )
         return "cpu"
@@ -24,21 +24,21 @@ def resolve_device(requested: str) -> str:
 
 
 def load_model(model_name: str, device: str):
-    """Load and return a Whisper model. Raises RuntimeError on failure."""
+    """Load and return a Whisper model. Raises TranslationError on failure."""
     try:
         import whisper
     except ImportError:
-        raise RuntimeError(
+        raise DependencyError(
             "openai-whisper is not installed. Run: uv add openai-whisper"
         )
 
     actual_device = resolve_device(device)
     try:
         model = whisper.load_model(model_name, device=actual_device)
-        model._actual_device = actual_device  # stash for transcription
+        model._actual_device = actual_device
         return model
     except Exception as e:
-        raise RuntimeError(
+        raise TranslationError(
             f"Failed to load Whisper model '{model_name}' on device '{actual_device}'.\n"
             f"Details: {e}"
         )
@@ -53,7 +53,7 @@ def translate_audio(
     device: str = "cpu",
     verbose: bool = False,
 ) -> TranslationResult:
-    """Translate audio. Pass a pre-loaded model to avoid reloading each call."""
+    """Translate audio. Pass a pre-loaded model to avoid reloading on each call."""
     if model is None:
         model = load_model(model_name, device)
 
@@ -68,7 +68,9 @@ def translate_audio(
             fp16=(actual_device == "cuda"),
         )
     except Exception as e:
-        raise RuntimeError(f"Transcription failed for '{input_path.name}'.\nDetails: {e}")
+        raise TranslationError(
+            f"Transcription failed for '{input_path.name}'.\nDetails: {e}"
+        )
 
     segments = [
         Segment(
