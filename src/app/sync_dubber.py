@@ -9,6 +9,7 @@ into a single MP3 that stays roughly in sync with the original video.
 import json
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 from app.elevenlabs_client import ElevenLabsTTS
@@ -98,13 +99,24 @@ def synthesize_synced(
                 current_time = end
                 continue
 
-            # Synthesize this segment
+            # Synthesize this segment (with retry on transient errors)
             seg_path = tmp / f"seg_{idx}.mp3"
-            try:
-                tts.synthesize_to_mp3(text, seg_path)
-            except Exception as e:
+            last_error: Exception | None = None
+            for attempt in range(1, 4):
+                try:
+                    tts.synthesize_to_mp3(text, seg_path)
+                    last_error = None
+                    break
+                except Exception as e:
+                    last_error = e
+                    if attempt < 3:
+                        wait = 5 * attempt
+                        if verbose:
+                            print(f"    segment {idx}: attempt {attempt} failed, retrying in {wait}s...")
+                        time.sleep(wait)
+            if last_error is not None:
                 raise TTSGenerationError(
-                    f"Synthesis failed for segment {idx}: {e}"
+                    f"Synthesis failed for segment {idx}: {last_error}"
                 )
 
             synth_duration = _get_audio_duration(seg_path)
