@@ -4,7 +4,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load .env from project root (or anywhere up the tree)
-load_dotenv(dotenv_path=Path(__file__).parents[3] / ".env", override=False)
+load_dotenv(dotenv_path=Path(__file__).parents[2] / ".env", override=False)
 
 # Whisper defaults
 DEFAULT_WHISPER_MODEL = "medium"
