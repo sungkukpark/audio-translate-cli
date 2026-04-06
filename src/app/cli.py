@@ -9,12 +9,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         prog="translate-audio",
         description="Translate Russian MP3 audio to English text and speech using Whisper + ElevenLabs.",
     )
-    parser.add_argument(
+
+    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group.add_argument(
         "--input", "-i",
-        required=True,
         type=Path,
-        help="Path to the input audio file (.mp3, .wav, .m4a, .mp4)",
+        help="Path to a single input audio file (.mp3, .wav, .m4a, .mp4)",
     )
+    input_group.add_argument(
+        "--input-dir",
+        type=Path,
+        help="Path to a folder; all .mp3 files inside will be processed in bulk",
+    )
+
     parser.add_argument(
         "--output-dir", "-o",
         type=Path,
@@ -46,12 +53,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--output-prefix",
         default=None,
-        help="Prefix for output filenames (default: input filename stem)",
+        help="Prefix for output filenames (default: input filename stem; ignored in bulk mode)",
     )
     parser.add_argument(
         "--skip-tts",
         action="store_true",
         help="Run Whisper translation only; skip ElevenLabs synthesis",
+    )
+    parser.add_argument(
+        "--tts-only",
+        action="store_true",
+        help="Skip Whisper; run TTS from existing .json files in input dir",
+    )
+    parser.add_argument(
+        "--sync-dub",
+        action="store_true",
+        help="Use segment-synchronized dubbing (aligns TTS to original timestamps)",
     )
     parser.add_argument(
         "--overwrite",
