@@ -13,7 +13,8 @@ DEFAULT_TASK = "translate"
 
 # ElevenLabs defaults
 DEFAULT_TTS_MODEL = "eleven_multilingual_v2"
-DEFAULT_VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"  # George (English, clear, neutral)
+DEFAULT_VOICE_ID = "RGb96Dcl0k5eVje8EBch"
+# DEFAULT_VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"  # George (English, clear, neutral)
 
 
 def get_elevenlabs_api_key() -> str | None:

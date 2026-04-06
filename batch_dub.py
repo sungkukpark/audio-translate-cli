@@ -12,7 +12,7 @@ Usage:
 Defaults:
     --source       D:/Dropbox/Lectures/CGMA/[CGMA 3D] - Level Design for Games/OUT
     --output-root  D:/Dropbox/Lectures/CGMA/[CGMA 3D] - Level Design for Games/OUT_2
-    --voice-id     JBFqnCBsd6RMkjVDRZzb
+    --voice-id     RGb96Dcl0k5eVje8EBch
     --tts-model    eleven_multilingual_v2
 """
 
